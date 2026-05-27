@@ -8,8 +8,10 @@ export class RolesService {
   private targetUrl: string;
 
   constructor(private readonly httpService: HttpService, private configService: ConfigService) {
-    this.targetUrl = `${this.configService.get('AUTH_MICROSERVICE_URL')}/roles` || 'http://localhost:3000';
-  }
+ const baseUrl = this.configService.get('AUTH_MICROSERVICE_URL') || 'http://localhost:3000';
+    
+    // Depois montamos a rota de usuários
+    this.targetUrl = `${baseUrl}/roles`;}
 
   // Função ajudante para tratar erros do axios
   private handleError(e: any) {

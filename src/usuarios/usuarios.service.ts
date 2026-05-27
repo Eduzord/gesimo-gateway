@@ -8,11 +8,20 @@ export class UsuariosService {
   private targetUrl: string;
 
   constructor(private readonly httpService: HttpService, private configService: ConfigService) {
-    this.targetUrl = `${this.configService.get('AUTH_MICROSERVICE_URL')}/usuarios` || 'http://localhost:3000';
+    const baseUrl = this.configService.get('AUTH_MICROSERVICE_URL') || 'http://localhost:3000';
+
+    // Depois montamos a rota de usuários
+    this.targetUrl = `${baseUrl}/usuarios`;
   }
 
   // Função ajudante para tratar erros do axios
   private handleError(e: any) {
+    // Adicione estes logs para inspecionar o acidente:
+    console.error('\n🚨 ERRO DE COMUNICAÇÃO NO GATEWAY 🚨');
+    console.error('Motivo exato:', e.message);
+    console.error('Destino tentado:', e.config?.url);
+    console.error('------------------------------------\n');
+
     return throwError(() => new HttpException(e.response?.data || 'Erro Interno', e.response?.status || 500));
   }
 
@@ -34,7 +43,7 @@ export class UsuariosService {
     return data;
   }
 
-async findOne(id: number, authHeader: string) {
+  async findOne(id: number, authHeader: string) {
     const { data } = await firstValueFrom(
       this.httpService.get(`${this.targetUrl}/${id}`, {
         headers: { Authorization: authHeader } // Repassa o token

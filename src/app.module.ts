@@ -6,6 +6,7 @@ import { HttpModule } from '@nestjs/axios';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { RolesModule } from './roles/roles.module';
+import { LocadorModule } from './locador/locador.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RolesModule } from './roles/roles.module';
     AuthModule,
     UsuariosModule,
     RolesModule,
+    LocadorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
