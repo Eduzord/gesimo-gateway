@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { RolesModule } from './roles/roles.module';
 import { LocadorModule } from './locador/locador.module';
+import { ImoveisModule } from './imoveis/imoveis.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { LocadorModule } from './locador/locador.module';
     UsuariosModule,
     RolesModule,
     LocadorModule,
+    ImoveisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
