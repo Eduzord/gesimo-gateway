@@ -15,9 +15,11 @@ export class AuthService {
   }
 
   async login(loginDto: any) {
+    console.log(`Tentando conectar na Auth API em: ${this.targetUrl}/auth/login`)
     const { data } = await firstValueFrom(
       this.httpService.post(`${this.targetUrl}/auth/login`, loginDto).pipe(
         catchError((e) => {
+          console.error('ERRO REAL DO AXIOS:', e.message);
           throw new HttpException(e.response?.data || 'Erro no Microsserviço', e.response?.status || 500);
         }),
       ),
