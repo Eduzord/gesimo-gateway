@@ -96,7 +96,7 @@ export class LocadorService {
     async healthCheck() {
         try {
             const { data } = await firstValueFrom(
-                this.httpService.get("http://localhost:3001/health").pipe(catchError(this.handleError))
+                this.httpService.get(`${this.targetUrl}/health`).pipe(catchError(this.handleError))
             );
             return data;
         } catch (e) {
