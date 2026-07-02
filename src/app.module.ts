@@ -9,6 +9,7 @@ import { RolesModule } from './roles/roles.module';
 import { LocadorModule } from './locador/locador.module';
 import { ImoveisModule } from './imoveis/imoveis.module';
 import { LocatariosModule } from './locatarios/locatarios.module';
+import { AgendamentosModule } from './agendamentos/agendamentos.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { LocatariosModule } from './locatarios/locatarios.module';
     LocadorModule,
     ImoveisModule,
     LocatariosModule,
+    AgendamentosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

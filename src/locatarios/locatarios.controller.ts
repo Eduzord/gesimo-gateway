@@ -1,13 +1,10 @@
-import { Controller, Get, Post, Body, Param, Headers, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Headers, Patch, Query, Delete } from '@nestjs/common';
 import { LocatariosService } from './locatarios.service';
 
 @Controller('locatarios')
 export class LocatariosController {
     constructor(private readonly locatariosService: LocatariosService) { }
 
-    // -----------------------------
-    // CRIAR LOCATÁRIO
-    // -----------------------------
     @Post()
     create(
         @Body() createLocatarioDto: any,
@@ -16,9 +13,12 @@ export class LocatariosController {
         return this.locatariosService.create(createLocatarioDto, authHeader);
     }
 
-    // -----------------------------
-    // LISTAR COM PAGINAÇÃO + FILTROS
-    // -----------------------------
+    // A Rota estática do Health Check sempre no topo para não dar conflito!
+    @Get('health')
+    healthCheck() {
+        return this.locatariosService.healthCheck();
+    }
+
     @Get()
     findAll(
         @Query() filtros: any,
@@ -27,9 +27,6 @@ export class LocatariosController {
         return this.locatariosService.findAll(filtros, authHeader);
     }
 
-    // -----------------------------
-    // BUSCAR POR ID
-    // -----------------------------
     @Get(':id')
     findOne(
         @Param('id') id: string,
@@ -38,9 +35,6 @@ export class LocatariosController {
         return this.locatariosService.findOne(+id, authHeader);
     }
 
-    // -----------------------------
-    // ATUALIZAR LOCATÁRIO
-    // -----------------------------
     @Patch(':id')
     update(
         @Param('id') id: string,
@@ -48,5 +42,22 @@ export class LocatariosController {
         @Headers('authorization') authHeader: string
     ) {
         return this.locatariosService.update(+id, updateLocatarioDto, authHeader);
+    }
+
+    // O Reativar também adicionado antes do Delete genérico
+    @Patch(':id/reativar')
+    reactivate(
+        @Param('id') id: string,
+        @Headers('authorization') authHeader: string
+    ) {
+        return this.locatariosService.reactivate(+id, authHeader);
+    }
+
+    @Delete(':id')
+    remove(
+        @Param('id') id: string,
+        @Headers('authorization') authHeader: string
+    ) {
+        return this.locatariosService.remove(+id, authHeader);
     }
 }

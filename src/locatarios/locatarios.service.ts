@@ -1,5 +1,3 @@
-// src/locatarios/locatarios.service.ts
-
 import { Injectable, HttpException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -7,15 +5,15 @@ import { catchError, firstValueFrom, throwError } from 'rxjs';
 
 @Injectable()
 export class LocatariosService {
+    private baseUrl: string;
     private targetUrl: string;
 
     constructor(private readonly httpService: HttpService, private configService: ConfigService) {
-        // Busca a URL no .env ou usa a porta 3002 como fallback
-        const baseUrl = this.configService.get('LOCATARIOS_MICROSERVICE_URL') || 'http://localhost:3002';
-        this.targetUrl = `${baseUrl}/locatarios`;
+        // Guardamos a baseUrl separada porque o /health fica na raiz, e não em /locatarios
+        this.baseUrl = this.configService.get('LOCATARIOS_MICROSERVICE_URL') || 'http://localhost:3002';
+        this.targetUrl = `${this.baseUrl}/locatarios`;
     }
 
-    // Função ajudante para tratar erros do axios
     private handleError = (e: any) => {
         console.error('\n🚨 ERRO DE COMUNICAÇÃO NO GATEWAY 🚨');
         console.error('Motivo exato:', e.message);
@@ -25,9 +23,6 @@ export class LocatariosService {
         return throwError(() => new HttpException(e.response?.data || 'Erro Interno', e.response?.status || 500));
     };
 
-    // -----------------------------
-    // CRIAR LOCATÁRIO (POST /locatarios)
-    // -----------------------------
     async create(createLocatarioDto: any, authHeader: string) {
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createLocatarioDto, {
@@ -37,22 +32,16 @@ export class LocatariosService {
         return data;
     }
 
-    // -----------------------------
-    // LISTAR COM FILTROS (GET /locatarios)
-    // -----------------------------
     async findAll(filtros: any, authHeader: string) {
         const { data } = await firstValueFrom(
             this.httpService.get(this.targetUrl, {
                 headers: { Authorization: authHeader },
-                params: filtros // Repassa a paginação e filtros (page, limit, status, email)
+                params: filtros 
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    // -----------------------------
-    // BUSCAR POR ID (GET /locatarios/:id)
-    // -----------------------------
     async findOne(id: number, authHeader: string) {
         const { data } = await firstValueFrom(
             this.httpService.get(`${this.targetUrl}/${id}`, {
@@ -62,9 +51,6 @@ export class LocatariosService {
         return data;
     }
 
-    // -----------------------------
-    // ATUALIZAR LOCATÁRIO (PATCH /locatarios/:id)
-    // -----------------------------
     async update(id: number, updateLocatarioDto: any, authHeader: string) {
         const { data } = await firstValueFrom(
             this.httpService.patch(`${this.targetUrl}/${id}`, updateLocatarioDto, {
@@ -72,5 +58,45 @@ export class LocatariosService {
             }).pipe(catchError(this.handleError))
         );
         return data;
+    }
+
+    // -----------------------------
+    // NOVAS ROTAS (SOFT DELETE E REATIVAR)
+    // -----------------------------
+
+    async remove(id: number, authHeader: string) {
+        const { data } = await firstValueFrom(
+            this.httpService.delete(`${this.targetUrl}/${id}`, {
+                headers: { Authorization: authHeader }
+            }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async reactivate(id: number, authHeader: string) {
+        const { data } = await firstValueFrom(
+            // No Axios, o segundo parâmetro do PATCH é o Body. 
+            // Como não mandamos dados para reativar, passamos um objeto vazio {}
+            this.httpService.patch(`${this.targetUrl}/${id}/reativar`, {}, {
+                headers: { Authorization: authHeader } 
+            }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    // -----------------------------
+    // NOVA ROTA (HEALTH CHECK)
+    // -----------------------------
+
+    async healthCheck() {
+        try {
+            const { data } = await firstValueFrom(
+                // Repare que aqui usamos o baseUrl direto, pois o controller dele é '/health'
+                this.httpService.get(`${this.baseUrl}/health`).pipe(catchError(this.handleError))
+            );
+            return data;
+        } catch (e) {
+            return { status: 'error', message: 'Locatários Microservice is down' };
+        }
     }
 }
