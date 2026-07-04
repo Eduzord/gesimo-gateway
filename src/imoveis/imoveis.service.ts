@@ -5,75 +5,112 @@ import { catchError, firstValueFrom, throwError } from 'rxjs';
 
 @Injectable()
 export class ImoveisService {
-    private targetUrl: string;
+    private baseUrl: string;
 
     constructor(private readonly httpService: HttpService, private configService: ConfigService) {
-        const baseUrl = this.configService.get('IMOVEIS_MICROSERVICE_URL') || 'http://localhost:3003/';
-
-        
-        this.targetUrl = `${baseUrl}/imoveis`;
+        this.baseUrl = this.configService.get('IMOVEIS_MICROSERVICE_URL') || 'http://localhost:3003';
     }
 
-        // Função ajudante para tratar erros do axios
     private handleError(e: any) {
-        // Adicione estes logs para inspecionar o acidente:
         console.error('\n🚨 ERRO DE COMUNICAÇÃO NO GATEWAY 🚨');
         console.error('Motivo exato:', e.message);
         console.error('Destino tentado:', e.config?.url);
         console.error('------------------------------------\n');
-
         return throwError(() => new HttpException(e.response?.data || 'Erro Interno', e.response?.status || 500));
     }
 
-    // Criar um imóvel no projeto
+    private getHeaders(user: any, extraHeaders = {}) {
+        return { 
+            Authorization: `Bearer ${user?.rawToken}`, 
+            'x-user-id': user?.sub || user?.id, 
+            'x-user-role': user?.role, 
+            'x-user-email': user?.email,
+            ...extraHeaders
+        };
+    }
+
+    // DOMÍNIO: IMÓVEIS
+    async getImoveis(user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/imoveis`, { headers: this.getHeaders(user) })
+                .pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
     async createImovel(createImovelDto: any, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.post(this.targetUrl, createImovelDto, {
-                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
-            }).pipe(catchError(this.handleError))
+            this.httpService.post(`${this.baseUrl}/imoveis`, createImovelDto, { headers: this.getHeaders(user) })
+                .pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    // Criar um contrato
+    async getCep(cep: string, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/imoveis/cep/${cep}`, { headers: this.getHeaders(user) })
+                .pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    // DOMÍNIO: CONTRATOS
+    async getContratos(user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/contratos`, { headers: this.getHeaders(user) })
+                .pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
     async createContrato(createContratoDto: any, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.post(`${this.targetUrl}/contratos`, createContratoDto, {
-                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
-            }).pipe(catchError(this.handleError))
+            this.httpService.post(`${this.baseUrl}/contratos`, createContratoDto, { headers: this.getHeaders(user) })
+                .pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    // Upload de PDF de contratos
-    async uploadContratoPdf(contratoId: string, pdfBuffer: Buffer, user: any) {
+    async updateContratoStatus(contratoId: string, updateDto: any, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.post(`${this.targetUrl}/contratos/${contratoId}/upload-pdf`, pdfBuffer, {
-                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email, 'Content-Type': 'application/pdf' }
-            }).pipe(catchError(this.handleError))
+            this.httpService.patch(`${this.baseUrl}/contratos/${contratoId}`, updateDto, { headers: this.getHeaders(user) })
+                .pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    // Lançamento de despesas
+    // DOMÍNIO: DESPESAS (FINANCEIRO)
+    async getDespesas(user: any, idContrato?: string) {
+        const url = idContrato ? `${this.baseUrl}/despesas?idContrato=${idContrato}` : `${this.baseUrl}/despesas`;
+        const { data } = await firstValueFrom(
+            this.httpService.get(url, { headers: this.getHeaders(user) })
+                .pipe(catchError(this.handleError))
+        );
+        return data;
+    }
 
     async createDespesa(createDespesaDto: any, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.post(`${this.targetUrl}/despesas`, createDespesaDto, {
-                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
-            }).pipe(catchError(this.handleError))
+            this.httpService.post(`${this.baseUrl}/despesas`, createDespesaDto, { headers: this.getHeaders(user) })
+                .pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async uploadDespesaPdf(despesaId: string, pdfBuffer: Buffer, user: any) {
+    async liquidarDespesa(despesaId: string, formPayload: any, user: any, contentType: string) {
         const { data } = await firstValueFrom(
-            this.httpService.post(`${this.targetUrl}/despesas/${despesaId}/upload-comprovante`, pdfBuffer, {
-                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email, 'Content-Type': 'application/pdf' }
+            this.httpService.patch(`${this.baseUrl}/despesas/${despesaId}/pagamento`, formPayload, {
+                headers: this.getHeaders(user, { 'Content-Type': contentType })
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
+    async deleteDespesa(despesaId: string, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.delete(`${this.baseUrl}/despesas/${despesaId}`, { headers: this.getHeaders(user) })
+                .pipe(catchError(this.handleError))
+        );
+        return data;
+    }
 }
-
