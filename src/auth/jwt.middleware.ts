@@ -27,7 +27,14 @@ export class JwtMiddleware implements NestMiddleware {
         }
         
         const decoded = jwt.verify(token, secret);
-        (req as any).user = decoded;
+        
+        // Armazenamos o token original junto com o payload decodificado
+        if (typeof decoded === 'object') {
+            (req as any).user = { ...decoded, rawToken: token };
+        } else {
+            (req as any).user = decoded;
+        }
+
         next();
     } catch (err) {
         throw new UnauthorizedException('Token inválido ou expirado');

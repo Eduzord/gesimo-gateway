@@ -22,7 +22,7 @@ export class RolesService {
   async create(createRoleDto: any, user: any) {
     const { data } = await firstValueFrom(
       this.httpService.post(this.targetUrl, createRoleDto, {
-        headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token!
+        headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token!
       }).pipe(catchError(this.handleError))
     );
     return data;
@@ -32,7 +32,7 @@ export class RolesService {
   async findAll(user: any) {
     const { data } = await firstValueFrom(
       this.httpService.get(this.targetUrl, {
-        headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token!
+        headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token!
       }).pipe(catchError(this.handleError))
     );
     return data;
@@ -41,7 +41,7 @@ export class RolesService {
 async findOne(id: number, user: any) {
     const { data } = await firstValueFrom(
       this.httpService.get(`${this.targetUrl}/${id}`, {
-        headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token
+        headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token
       }).pipe(catchError(this.handleError))
     );
     return data;
@@ -50,7 +50,7 @@ async findOne(id: number, user: any) {
   async update(id: number, updateRoleDto: any, user: any) {
     const { data } = await firstValueFrom(
       this.httpService.patch(`${this.targetUrl}/${id}`, updateRoleDto, {
-        headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token
+        headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token
       }).pipe(catchError(this.handleError))
     );
     return data;
@@ -60,7 +60,7 @@ async findOne(id: number, user: any) {
   async remove(id: number, user: any) {
     const { data } = await firstValueFrom(
       this.httpService.delete(`${this.targetUrl}/${id}`, {
-        headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+        headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
       }).pipe(catchError(this.handleError))
     );
     return data;

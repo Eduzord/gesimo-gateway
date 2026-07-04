@@ -26,7 +26,7 @@ export class LocatariosService {
     async create(createLocatarioDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createLocatarioDto, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -35,7 +35,7 @@ export class LocatariosService {
     async findAll(filtros: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(this.targetUrl, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email },
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email },
                 params: filtros 
             }).pipe(catchError(this.handleError))
         );
@@ -45,7 +45,7 @@ export class LocatariosService {
     async findOne(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(`${this.targetUrl}/${id}`, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -54,7 +54,7 @@ export class LocatariosService {
     async update(id: number, updateLocatarioDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.patch(`${this.targetUrl}/${id}`, updateLocatarioDto, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -67,7 +67,7 @@ export class LocatariosService {
     async remove(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.delete(`${this.targetUrl}/${id}`, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -78,7 +78,7 @@ export class LocatariosService {
             // No Axios, o segundo parâmetro do PATCH é o Body. 
             // Como não mandamos dados para reativar, passamos um objeto vazio {}
             this.httpService.patch(`${this.targetUrl}/${id}/reativar`, {}, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } 
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } 
             }).pipe(catchError(this.handleError))
         );
         return data;

@@ -32,7 +32,7 @@ export class AgendamentosService {
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createAgendamentoDto, {
                 headers: { 
-                    'x-user-id': user?.sub || user?.id,
+                    Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id,
                     'x-user-role': user?.role,
                     'x-user-email': user?.email
                  }
@@ -48,7 +48,7 @@ export class AgendamentosService {
         const { data } = await firstValueFrom(
             this.httpService.get(this.targetUrl, {
                 headers: { 
-                    'x-user-id': user?.sub || user?.id,
+                    Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id,
                     'x-user-role': user?.role,
                     'x-user-email': user?.email
                  }
@@ -64,7 +64,7 @@ export class AgendamentosService {
         const { data } = await firstValueFrom(
             this.httpService.get(`${this.targetUrl}/available-slots`, {
                 headers: { 
-                    'x-user-id': user?.sub || user?.id,
+                    Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id,
                     'x-user-role': user?.role,
                     'x-user-email': user?.email
                  },
@@ -81,7 +81,7 @@ export class AgendamentosService {
         const { data } = await firstValueFrom(
             this.httpService.delete(`${this.targetUrl}/${id}`, {
                 headers: { 
-                    'x-user-id': user?.sub || user?.id,
+                    Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id,
                     'x-user-role': user?.role,
                     'x-user-email': user?.email
                  }

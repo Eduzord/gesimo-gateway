@@ -29,7 +29,7 @@ export class ImoveisService {
     async createImovel(createImovelDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createImovelDto, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -39,7 +39,7 @@ export class ImoveisService {
     async createContrato(createContratoDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(`${this.targetUrl}/contratos`, createContratoDto, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -49,7 +49,7 @@ export class ImoveisService {
     async uploadContratoPdf(contratoId: string, pdfBuffer: Buffer, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(`${this.targetUrl}/contratos/${contratoId}/upload-pdf`, pdfBuffer, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email, 'Content-Type': 'application/pdf' }
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email, 'Content-Type': 'application/pdf' }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -60,7 +60,7 @@ export class ImoveisService {
     async createDespesa(createDespesaDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(`${this.targetUrl}/despesas`, createDespesaDto, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -69,10 +69,11 @@ export class ImoveisService {
     async uploadDespesaPdf(despesaId: string, pdfBuffer: Buffer, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(`${this.targetUrl}/despesas/${despesaId}/upload-comprovante`, pdfBuffer, {
-                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email, 'Content-Type': 'application/pdf' }
+                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email, 'Content-Type': 'application/pdf' }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
 }
+
