@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Headers, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Headers, Patch, Query , Req } from '@nestjs/common';
 import { ImoveisService } from './imoveis.service';
 
 @Controller('imoveis')
@@ -9,18 +9,18 @@ export class ImoveisController {
     @Post()
     create(
         @Body() createImovelDto: any,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.imoveisService.createImovel(createImovelDto, authHeader);
+        return this.imoveisService.createImovel(createImovelDto, req.user);
     }
     
     //Criar um contrato
     @Post('contratos')
     createContrato(
         @Body() createContratoDto: any,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.imoveisService.createContrato(createContratoDto, authHeader);
+        return this.imoveisService.createContrato(createContratoDto, req.user);
     }
 
     // Upload de PDF de contratos
@@ -28,9 +28,9 @@ export class ImoveisController {
     uploadContratoPdf(
         @Param('id') contratoId: string,
         @Body() pdfBuffer: Buffer,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.imoveisService.uploadContratoPdf(contratoId, pdfBuffer, authHeader);
+        return this.imoveisService.uploadContratoPdf(contratoId, pdfBuffer, req.user);
     }
 
     // Lançamento de despesas
@@ -38,9 +38,9 @@ export class ImoveisController {
     @Post('despesas')
     createDespesa(
         @Body() createDespesaDto: any,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.imoveisService.createDespesa(createDespesaDto, authHeader);
+        return this.imoveisService.createDespesa(createDespesaDto, req.user);
     }
 
     // Upload de PDF de despesas
@@ -48,9 +48,9 @@ export class ImoveisController {
     uploadDespesaPdf(
         @Param('id') despesaId: string,
         @Body() pdfBuffer: Buffer,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.imoveisService.uploadDespesaPdf(despesaId, pdfBuffer, authHeader);
+        return this.imoveisService.uploadDespesaPdf(despesaId, pdfBuffer, req.user);
     }
 
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Headers, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Query, Req } from '@nestjs/common';
 import { AgendamentosService } from './agendamentos.service';
 
 @Controller('agendamentos') // A rota pública no Gateway fica em português
@@ -11,9 +11,9 @@ export class AgendamentosController {
     @Post()
     create(
         @Body() createAgendamentoDto: any,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.agendamentosService.create(createAgendamentoDto, authHeader);
+        return this.agendamentosService.create(createAgendamentoDto, req.user);
     }
 
     // -----------------------------
@@ -22,9 +22,9 @@ export class AgendamentosController {
     @Get('available-slots')
     availableSlots(
         @Query() filtros: any,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.agendamentosService.availableSlots(filtros, authHeader);
+        return this.agendamentosService.availableSlots(filtros, req.user);
     }
 
     // -----------------------------
@@ -32,9 +32,9 @@ export class AgendamentosController {
     // -----------------------------
     @Get()
     findAll(
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.agendamentosService.findAll(authHeader);
+        return this.agendamentosService.findAll(req.user);
     }
 
     // -----------------------------
@@ -43,8 +43,8 @@ export class AgendamentosController {
     @Delete(':id')
     cancel(
         @Param('id') id: string,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.agendamentosService.cancel(+id, authHeader);
+        return this.agendamentosService.cancel(+id, req.user);
     }
 }

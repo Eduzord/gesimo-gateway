@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Headers, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Headers, Patch, Query , Req } from '@nestjs/common';
 import { LocadorService } from './locador.service';
 
 @Controller('locador')
@@ -8,9 +8,9 @@ export class LocadorController {
     @Post()
     create(
         @Body() createLocadorDto: any,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.locadorService.createLocadores(createLocadorDto, authHeader);
+        return this.locadorService.createLocadores(createLocadorDto, req.user);
     }
 
     // 1. ROTA ESTÁTICA LÁ NO TOPO
@@ -23,41 +23,41 @@ export class LocadorController {
     @Get()
     findAll(
         @Query() filtros: any,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
         // Se houver "?status=ATIVO", enviamos os filtros.
         // O Service vai repassar via Axios perfeitamente.
-        return this.locadorService.findActive(filtros, authHeader);
+        return this.locadorService.findActive(filtros, req.user);
     }
 
     // 3. ROTAS DINÂMICAS (:id) SEMPRE NO FINAL
     @Get(':id')
     findOne(
         @Param('id') id: string,
-        @Headers('authorization') authHeader: string) {
-        return this.locadorService.findOne(+id, authHeader);
+        @Req() req: any) {
+        return this.locadorService.findOne(+id, req.user);
     }
 
     @Patch(':id')
     update(
         @Param('id') id: string,
         @Body() updateLocadorDto: any,
-        @Headers('authorization') authHeader: string) {
-        return this.locadorService.update(+id, updateLocadorDto, authHeader);
+        @Req() req: any) {
+        return this.locadorService.update(+id, updateLocadorDto, req.user);
     }
 
     // 4. ROTA DE REATIVAR ARRUMADA PARA NÃO DAR CONFLITO COM O UPDATE
     @Patch(':id/reativar')
     reactivate(
         @Param('id') id: string,
-        @Headers('authorization') authHeader: string) {
-        return this.locadorService.reactivate(+id, authHeader);
+        @Req() req: any) {
+        return this.locadorService.reactivate(+id, req.user);
     }
 
     @Delete(':id')
     remove(
         @Param('id') id: string,
-        @Headers('authorization') authHeader: string) {
-        return this.locadorService.remove(+id, authHeader);
+        @Req() req: any) {
+        return this.locadorService.remove(+id, req.user);
     }
 }

@@ -23,38 +23,38 @@ export class LocatariosService {
         return throwError(() => new HttpException(e.response?.data || 'Erro Interno', e.response?.status || 500));
     };
 
-    async create(createLocatarioDto: any, authHeader: string) {
+    async create(createLocatarioDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createLocatarioDto, {
-                headers: { Authorization: authHeader }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async findAll(filtros: any, authHeader: string) {
+    async findAll(filtros: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(this.targetUrl, {
-                headers: { Authorization: authHeader },
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email },
                 params: filtros 
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async findOne(id: number, authHeader: string) {
+    async findOne(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(`${this.targetUrl}/${id}`, {
-                headers: { Authorization: authHeader }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async update(id: number, updateLocatarioDto: any, authHeader: string) {
+    async update(id: number, updateLocatarioDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.patch(`${this.targetUrl}/${id}`, updateLocatarioDto, {
-                headers: { Authorization: authHeader }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -64,21 +64,21 @@ export class LocatariosService {
     // NOVAS ROTAS (SOFT DELETE E REATIVAR)
     // -----------------------------
 
-    async remove(id: number, authHeader: string) {
+    async remove(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.delete(`${this.targetUrl}/${id}`, {
-                headers: { Authorization: authHeader }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async reactivate(id: number, authHeader: string) {
+    async reactivate(id: number, user: any) {
         const { data } = await firstValueFrom(
             // No Axios, o segundo parâmetro do PATCH é o Body. 
             // Como não mandamos dados para reativar, passamos um objeto vazio {}
             this.httpService.patch(`${this.targetUrl}/${id}/reativar`, {}, {
-                headers: { Authorization: authHeader } 
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } 
             }).pipe(catchError(this.handleError))
         );
         return data;

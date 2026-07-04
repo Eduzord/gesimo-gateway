@@ -26,67 +26,67 @@ export class LocadorService {
     }
 
 
-    async createLocadores(createLocadorDto: any, authHeader: string) {
+    async createLocadores(createLocadorDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createLocadorDto, {
-                headers: { Authorization: authHeader }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
     // FIND ALL - Rota protegida
-    async findAll(authHeader: string) {
+    async findAll(user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(this.targetUrl, {
-                headers: { Authorization: authHeader } // Repassa o token!
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token!
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async findActive(filtros: any, authHeader: string) {
+    async findActive(filtros: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(this.targetUrl, {
-                headers: { Authorization: authHeader }, // Repassa o token!
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }, // Repassa o token!
                 params: filtros
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async findOne(id: number, authHeader: string) {
+    async findOne(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(`${this.targetUrl}/${id}`, {
-                headers: { Authorization: authHeader } // Repassa o token
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async update(id: number, updateLocadorDto: any, authHeader: string) {
+    async update(id: number, updateLocadorDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.patch(`${this.targetUrl}/${id}`, updateLocadorDto, {
-                headers: { Authorization: authHeader } // Repassa o token
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
     // DELETE
-    async remove(id: number, authHeader: string) {
+    async remove(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.delete(`${this.targetUrl}/${id}`, {
-                headers: { Authorization: authHeader }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async reactivate(id: number, authHeader: string) {
+    async reactivate(id: number, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.patch(`${this.targetUrl}/${id}/reativar`, {
-                headers: { Authorization: authHeader } // Repassa o token
+            this.httpService.patch(`${this.targetUrl}/${id}/reativar`, {}, {
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token
             }).pipe(catchError(this.handleError))
         );
         return data;

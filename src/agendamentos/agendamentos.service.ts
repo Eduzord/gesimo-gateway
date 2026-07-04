@@ -13,7 +13,7 @@ export class AgendamentosService {
         
         // A porta de saída do Gateway fala em português (agendamentos), 
         // mas bate na rota original do microsserviço em inglês (appointments)
-        this.targetUrl = `${baseUrl}/appointments`; 
+        this.targetUrl = `${baseUrl}/api/appointments`; 
     }
 
     private handleError = (e: any) => {
@@ -28,10 +28,14 @@ export class AgendamentosService {
     // -----------------------------
     // CRIAR AGENDAMENTO
     // -----------------------------
-    async create(createAgendamentoDto: any, authHeader: string) {
+    async create(createAgendamentoDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createAgendamentoDto, {
-                headers: { Authorization: authHeader }
+                headers: { 
+                    'x-user-id': user?.sub || user?.id,
+                    'x-user-role': user?.role,
+                    'x-user-email': user?.email
+                 }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -40,10 +44,14 @@ export class AgendamentosService {
     // -----------------------------
     // LISTAR TODOS DO USUÁRIO
     // -----------------------------
-    async findAll(authHeader: string) {
+    async findAll(user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(this.targetUrl, {
-                headers: { Authorization: authHeader }
+                headers: { 
+                    'x-user-id': user?.sub || user?.id,
+                    'x-user-role': user?.role,
+                    'x-user-email': user?.email
+                 }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -52,10 +60,14 @@ export class AgendamentosService {
     // -----------------------------
     // LISTAR HORÁRIOS DISPONÍVEIS
     // -----------------------------
-    async availableSlots(filtros: any, authHeader: string) {
+    async availableSlots(filtros: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(`${this.targetUrl}/available-slots`, {
-                headers: { Authorization: authHeader },
+                headers: { 
+                    'x-user-id': user?.sub || user?.id,
+                    'x-user-role': user?.role,
+                    'x-user-email': user?.email
+                 },
                 params: filtros // Repassa o ?date=YYYY-MM-DD
             }).pipe(catchError(this.handleError))
         );
@@ -65,10 +77,14 @@ export class AgendamentosService {
     // -----------------------------
     // CANCELAR AGENDAMENTO
     // -----------------------------
-    async cancel(id: number, authHeader: string) {
+    async cancel(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.delete(`${this.targetUrl}/${id}`, {
-                headers: { Authorization: authHeader }
+                headers: { 
+                    'x-user-id': user?.sub || user?.id,
+                    'x-user-role': user?.role,
+                    'x-user-email': user?.email
+                 }
             }).pipe(catchError(this.handleError))
         );
         return data;

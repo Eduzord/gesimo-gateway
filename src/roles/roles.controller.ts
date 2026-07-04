@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Headers, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Headers, Patch , Req } from '@nestjs/common';
 import { RolesService } from './roles.service';
 
 @Controller('roles')
@@ -8,34 +8,34 @@ export class RolesController {
     @Post()
     create(
         @Body() createRoleDto: any,
-        @Headers('authorization') authHeader: string
+        @Req() req: any
     ) {
-        return this.rolesService.create(createRoleDto, authHeader);
+        return this.rolesService.create(createRoleDto, req.user);
     }
 
     // Pegamos o header Authorization que veio do Front-end
     @Get()
-    findAll(@Headers('authorization') authHeader: string) {
-        return this.rolesService.findAll(authHeader);
+    findAll(@Req() req: any) {
+        return this.rolesService.findAll(req.user);
     }
 
     @Get(':id')
     findOne(
         @Param('id') id: string,
-        @Headers('authorization') authHeader: string) {
-        return this.rolesService.findOne(+id, authHeader);
+        @Req() req: any) {
+        return this.rolesService.findOne(+id, req.user);
     }
 
     @Patch(':id')
     update(
         @Param('id') id: string,
         @Body() updateRoleDto: any,
-        @Headers('authorization') authHeader: string) {
-        return this.rolesService.update(+id, updateRoleDto, authHeader);
+        @Req() req: any) {
+        return this.rolesService.update(+id, updateRoleDto, req.user);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string, @Headers('authorization') authHeader: string) {
-        return this.rolesService.remove(+id, authHeader);
+    remove(@Param('id') id: string, @Req() req: any) {
+        return this.rolesService.remove(+id, req.user);
     }
 }

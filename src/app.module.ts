@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -10,6 +10,7 @@ import { LocadorModule } from './locador/locador.module';
 import { ImoveisModule } from './imoveis/imoveis.module';
 import { LocatariosModule } from './locatarios/locatarios.module';
 import { AgendamentosModule } from './agendamentos/agendamentos.module';
+import { JwtMiddleware } from './auth/jwt.middleware';
 
 @Module({
   imports: [
@@ -28,4 +29,22 @@ import { AgendamentosModule } from './agendamentos/agendamentos.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(JwtMiddleware)
+      .exclude(
+        { path: 'usuarios', method: RequestMethod.POST },
+        { path: 'locador/health', method: RequestMethod.GET },
+        { path: 'locatarios/health', method: RequestMethod.GET }
+      )
+      .forRoutes(
+        'agendamentos',
+        'imoveis',
+        'locador',
+        'locatarios',
+        'roles',
+        'usuarios'
+      );
+  }
+}

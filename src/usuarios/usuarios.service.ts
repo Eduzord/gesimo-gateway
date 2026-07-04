@@ -34,38 +34,38 @@ export class UsuariosService {
   }
 
   // FIND ALL - Rota protegida
-  async findAll(authHeader: string) {
+  async findAll(user: any) {
     const { data } = await firstValueFrom(
       this.httpService.get(this.targetUrl, {
-        headers: { Authorization: authHeader } // Repassa o token!
+        headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token!
       }).pipe(catchError(this.handleError))
     );
     return data;
   }
 
-  async findOne(id: number, authHeader: string) {
+  async findOne(id: number, user: any) {
     const { data } = await firstValueFrom(
       this.httpService.get(`${this.targetUrl}/${id}`, {
-        headers: { Authorization: authHeader } // Repassa o token
+        headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token
       }).pipe(catchError(this.handleError))
     );
     return data;
   }
 
-  async update(id: number, updateUsuarioDto: any, authHeader: string) {
+  async update(id: number, updateUsuarioDto: any, user: any) {
     const { data } = await firstValueFrom(
       this.httpService.patch(`${this.targetUrl}/${id}`, updateUsuarioDto, {
-        headers: { Authorization: authHeader } // Repassa o token
+        headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token
       }).pipe(catchError(this.handleError))
     );
     return data;
   }
 
   // DELETE - Rota protegida por Admin
-  async remove(id: number, authHeader: string) {
+  async remove(id: number, user: any) {
     const { data } = await firstValueFrom(
       this.httpService.delete(`${this.targetUrl}/${id}`, {
-        headers: { Authorization: authHeader }
+        headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
       }).pipe(catchError(this.handleError))
     );
     return data;

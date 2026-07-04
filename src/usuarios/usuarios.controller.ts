@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Headers, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Headers, Patch , Req } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 
 @Controller('usuarios')
@@ -12,27 +12,27 @@ export class UsuariosController {
 
     // Pegamos o header Authorization que veio do Front-end
     @Get()
-    findAll(@Headers('authorization') authHeader: string) {
-        return this.usuariosService.findAll(authHeader);
+    findAll(@Req() req: any) {
+        return this.usuariosService.findAll(req.user);
     }
 
     @Get(':id')
     findOne(
         @Param('id') id: string,
-        @Headers('authorization') authHeader: string) {
-        return this.usuariosService.findOne(+id, authHeader);
+        @Req() req: any) {
+        return this.usuariosService.findOne(+id, req.user);
     }
 
     @Patch(':id')
     update(
         @Param('id') id: string,
         @Body() updateUsuarioDto: any,
-        @Headers('authorization') authHeader: string) {
-        return this.usuariosService.update(+id, updateUsuarioDto, authHeader);
+        @Req() req: any) {
+        return this.usuariosService.update(+id, updateUsuarioDto, req.user);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string, @Headers('authorization') authHeader: string) {
-        return this.usuariosService.remove(+id, authHeader);
+    remove(@Param('id') id: string, @Req() req: any) {
+        return this.usuariosService.remove(+id, req.user);
     }
 }

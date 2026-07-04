@@ -26,30 +26,30 @@ export class ImoveisService {
     }
 
     // Criar um imóvel no projeto
-    async createImovel(createImovelDto: any, authHeader: string) {
+    async createImovel(createImovelDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createImovelDto, {
-                headers: { Authorization: authHeader }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
     // Criar um contrato
-    async createContrato(createContratoDto: any, authHeader: string) {
+    async createContrato(createContratoDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(`${this.targetUrl}/contratos`, createContratoDto, {
-                headers: { Authorization: authHeader }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
     // Upload de PDF de contratos
-    async uploadContratoPdf(contratoId: string, pdfBuffer: Buffer, authHeader: string) {
+    async uploadContratoPdf(contratoId: string, pdfBuffer: Buffer, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(`${this.targetUrl}/contratos/${contratoId}/upload-pdf`, pdfBuffer, {
-                headers: { Authorization: authHeader, 'Content-Type': 'application/pdf' }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email, 'Content-Type': 'application/pdf' }
             }).pipe(catchError(this.handleError))
         );
         return data;
@@ -57,19 +57,19 @@ export class ImoveisService {
 
     // Lançamento de despesas
 
-    async createDespesa(createDespesaDto: any, authHeader: string) {
+    async createDespesa(createDespesaDto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(`${this.targetUrl}/despesas`, createDespesaDto, {
-                headers: { Authorization: authHeader }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async uploadDespesaPdf(despesaId: string, pdfBuffer: Buffer, authHeader: string) {
+    async uploadDespesaPdf(despesaId: string, pdfBuffer: Buffer, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(`${this.targetUrl}/despesas/${despesaId}/upload-comprovante`, pdfBuffer, {
-                headers: { Authorization: authHeader, 'Content-Type': 'application/pdf' }
+                headers: { 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email, 'Content-Type': 'application/pdf' }
             }).pipe(catchError(this.handleError))
         );
         return data;
