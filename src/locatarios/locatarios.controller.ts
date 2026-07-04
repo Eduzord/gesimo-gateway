@@ -1,6 +1,9 @@
 import { Controller, Get, Post, Body, Param, Headers, Patch, Query, Delete , Req } from '@nestjs/common';
 import { LocatariosService } from './locatarios.service';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('locatarios')
+@ApiBearerAuth()
 @Controller('locatarios')
 export class LocatariosController {
     constructor(private readonly locatariosService: LocatariosService) { }

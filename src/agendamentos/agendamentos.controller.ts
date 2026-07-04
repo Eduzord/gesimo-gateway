@@ -1,6 +1,9 @@
 import { Controller, Get, Post, Body, Delete, Param, Query, Req } from '@nestjs/common';
 import { AgendamentosService } from './agendamentos.service';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('agendamentos')
+@ApiBearerAuth()
 @Controller('agendamentos') // A rota pública no Gateway fica em português
 export class AgendamentosController {
     constructor(private readonly agendamentosService: AgendamentosService) {}

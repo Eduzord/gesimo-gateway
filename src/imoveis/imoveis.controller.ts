@@ -1,6 +1,9 @@
 import { Controller, Get, Post, Body, Delete, Param, Headers, Patch, Query , Req } from '@nestjs/common';
 import { ImoveisService } from './imoveis.service';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('imoveis')
+@ApiBearerAuth()
 @Controller('imoveis')
 export class ImoveisController {
     constructor(private readonly imoveisService: ImoveisService) { }
