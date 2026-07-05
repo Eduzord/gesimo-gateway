@@ -4,7 +4,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('locadores')
 @ApiBearerAuth()
-@Controller('locador')
+@Controller('locadores')
 export class LocadorController {
     constructor(private readonly locadorService: LocadorService) { }
 

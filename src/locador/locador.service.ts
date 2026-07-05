@@ -25,16 +25,22 @@ export class LocadorService {
         return throwError(() => new HttpException(e.response?.data || 'Erro Interno', e.response?.status || 500));
     }
 
-
     async createLocadores(createLocadorDto: any, user: any) {
+        // LOG DE SEGURANÇA PARA DEBUGAR
+        console.log("Token enviado para o microsserviço:", user?.rawToken);
+
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createLocadorDto, {
-                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+                headers: {
+                    Authorization: `Bearer ${user?.rawToken}`, // Se for undefined aqui, o 401 é inevitável
+                    'x-user-id': user?.sub || user?.id,
+                    'x-user-role': user?.role,
+                    'x-user-email': user?.email
+                }
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
-
     // FIND ALL - Rota protegida
     async findAll(user: any) {
         const { data } = await firstValueFrom(
