@@ -48,11 +48,15 @@ export class JwtMiddleware implements NestMiddleware {
                 const authApiUrl = this.configService.get<string>('AUTH_MICROSERVICE_URL') || 'http://localhost:3000';
                 
                 // Opcionalmente podemos usar o próprio token na requisição
-                await firstValueFrom(
+                const { data: usuario } = await firstValueFrom(
                     this.httpService.get(`${authApiUrl}/usuarios/${userId}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     })
                 );
+
+                if (usuario && usuario.status !== 1) {
+                    throw new Error('Usuário inativo no banco de dados.');
+                }
             } catch (err: any) {
                 console.error(`Falha ao validar usuário no banco. ID: ${userId}. Motivo: ${err.message}`);
                 throw new UnauthorizedException('Usuário não encontrado ou inativo no sistema.');
