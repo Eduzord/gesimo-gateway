@@ -36,7 +36,8 @@ export class AppModule implements NestModule {
       .exclude(
         { path: 'usuarios', method: RequestMethod.POST },
         { path: 'locador/health', method: RequestMethod.GET },
-        { path: 'locatarios/health', method: RequestMethod.GET }
+        { path: 'locatarios/health', method: RequestMethod.GET },
+        { path: 'imoveis/health', method: RequestMethod.GET }
       )
       .forRoutes(
         'agendamentos',
