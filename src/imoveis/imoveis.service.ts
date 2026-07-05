@@ -2,13 +2,19 @@ import { Injectable, HttpException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom, throwError } from 'rxjs';
+import * as FormDataImport from 'form-data';
+const FormData = FormDataImport as any;
 
 @Injectable()
 export class ImoveisService {
     private baseUrl: string;
 
     constructor(private readonly httpService: HttpService, private configService: ConfigService) {
-        this.baseUrl = this.configService.get('IMOVEIS_MICROSERVICE_URL') || 'http://localhost:3003';
+        let url = this.configService.get('IMOVEIS_MICROSERVICE_URL') || 'http://localhost:3003';
+        if (url.endsWith('/')) {
+            url = url.slice(0, -1);
+        }
+        this.baseUrl = url;
     }
 
     private handleError(e: any) {
@@ -19,97 +25,152 @@ export class ImoveisService {
         return throwError(() => new HttpException(e.response?.data || 'Erro Interno', e.response?.status || 500));
     }
 
-    private getHeaders(user: any, extraHeaders = {}) {
-        return { 
+    private getHeaders(user: any, additionalHeaders: any = {}) {
+        return {
             Authorization: `Bearer ${user?.rawToken}`, 
             'x-user-id': user?.sub || user?.id, 
             'x-user-role': user?.role, 
             'x-user-email': user?.email,
-            ...extraHeaders
+            ...additionalHeaders
         };
     }
 
-    // DOMÍNIO: IMÓVEIS
-    async getImoveis(user: any) {
-        const { data } = await firstValueFrom(
-            this.httpService.get(`${this.baseUrl}/imoveis`, { headers: this.getHeaders(user) })
-                .pipe(catchError(this.handleError))
-        );
-        return data;
-    }
-
+    // --- IMÓVEIS ---
     async createImovel(createImovelDto: any, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.post(`${this.baseUrl}/imoveis`, createImovelDto, { headers: this.getHeaders(user) })
-                .pipe(catchError(this.handleError))
+            this.httpService.post(`${this.baseUrl}/imoveis`, createImovelDto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
         );
         return data;
     }
-
-    async getCep(cep: string, user: any) {
+    
+    async findAllImoveis(user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.get(`${this.baseUrl}/imoveis/cep/${cep}`, { headers: this.getHeaders(user) })
-                .pipe(catchError(this.handleError))
+            this.httpService.get(`${this.baseUrl}/imoveis`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
         );
         return data;
     }
-
-    // DOMÍNIO: CONTRATOS
-    async getContratos(user: any) {
+    
+    async findOneImovel(id: number, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.get(`${this.baseUrl}/contratos`, { headers: this.getHeaders(user) })
-                .pipe(catchError(this.handleError))
+            this.httpService.get(`${this.baseUrl}/imoveis/${id}`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+    
+    async updateImovel(id: number, updateImovelDto: any, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.patch(`${this.baseUrl}/imoveis/${id}`, updateImovelDto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+    
+    async removeImovel(id: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.delete(`${this.baseUrl}/imoveis/${id}`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
+    // --- CONTRATOS ---
     async createContrato(createContratoDto: any, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.post(`${this.baseUrl}/contratos`, createContratoDto, { headers: this.getHeaders(user) })
-                .pipe(catchError(this.handleError))
+            this.httpService.post(`${this.baseUrl}/contratos`, createContratoDto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async updateContratoStatus(contratoId: string, updateDto: any, user: any) {
+    async findAllContratos(user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.patch(`${this.baseUrl}/contratos/${contratoId}`, updateDto, { headers: this.getHeaders(user) })
-                .pipe(catchError(this.handleError))
+            this.httpService.get(`${this.baseUrl}/contratos`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    // DOMÍNIO: DESPESAS (FINANCEIRO)
-    async getDespesas(user: any, idContrato?: string) {
-        const url = idContrato ? `${this.baseUrl}/despesas?idContrato=${idContrato}` : `${this.baseUrl}/despesas`;
+    async findOneContrato(id: number, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.get(url, { headers: this.getHeaders(user) })
-                .pipe(catchError(this.handleError))
+            this.httpService.get(`${this.baseUrl}/contratos/${id}`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async createDespesa(createDespesaDto: any, user: any) {
-        const { data } = await firstValueFrom(
-            this.httpService.post(`${this.baseUrl}/despesas`, createDespesaDto, { headers: this.getHeaders(user) })
-                .pipe(catchError(this.handleError))
-        );
-        return data;
-    }
+    async uploadContratoPdf(contratoId: string, file: Express.Multer.File, user: any) {
+        const formData = new FormData();
+        formData.append('file', file.buffer, { filename: file.originalname || 'contrato.pdf', contentType: file.mimetype });
 
-    async liquidarDespesa(despesaId: string, formPayload: any, user: any, contentType: string) {
         const { data } = await firstValueFrom(
-            this.httpService.patch(`${this.baseUrl}/despesas/${despesaId}/pagamento`, formPayload, {
-                headers: this.getHeaders(user, { 'Content-Type': contentType })
+            this.httpService.patch(`${this.baseUrl}/contratos/${contratoId}/arquivo`, formData, { 
+                headers: this.getHeaders(user, formData.getHeaders()) 
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
 
-    async deleteDespesa(despesaId: string, user: any) {
+    async updateContratoDados(id: number, atualizarContratoDto: any, user: any) {
         const { data } = await firstValueFrom(
-            this.httpService.delete(`${this.baseUrl}/despesas/${despesaId}`, { headers: this.getHeaders(user) })
-                .pipe(catchError(this.handleError))
+            this.httpService.patch(`${this.baseUrl}/contratos/${id}/dados`, atualizarContratoDto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async rescindirContrato(id: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.patch(`${this.baseUrl}/contratos/${id}/rescisao`, {}, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    // --- DESPESAS ---
+    async createDespesa(createDespesaDto: any, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.post(`${this.baseUrl}/despesas`, createDespesaDto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async findAllDespesas(idContrato: string | undefined, user: any) {
+        const url = idContrato ? `${this.baseUrl}/despesas?idContrato=${idContrato}` : `${this.baseUrl}/despesas`;
+        const { data } = await firstValueFrom(
+            this.httpService.get(url, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async uploadDespesaPdf(despesaId: string, file: Express.Multer.File, dataPagamentoStr: string, user: any) {
+        const formData = new FormData();
+        formData.append('file', file.buffer, { filename: file.originalname || 'comprovante.pdf', contentType: file.mimetype });
+        if (dataPagamentoStr) {
+            formData.append('dataPagamento', dataPagamentoStr);
+        }
+
+        const { data } = await firstValueFrom(
+            this.httpService.patch(`${this.baseUrl}/despesas/${despesaId}/pagamento`, formData, { 
+                headers: this.getHeaders(user, formData.getHeaders()) 
+            }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async downloadComprovante(id: number, user: any) {
+        const response = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/despesas/${id}/comprovante`, { 
+                headers: this.getHeaders(user),
+                responseType: 'arraybuffer' // para baixar arquivo PDF/Buffer
+            }).pipe(catchError(this.handleError))
+        );
+        return response.data;
+    }
+
+    async removeDespesa(id: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.delete(`${this.baseUrl}/despesas/${id}`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    // --- HEALTH ---
+    async checkHealth() {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/health`).pipe(catchError(this.handleError))
         );
         return data;
     }

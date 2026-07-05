@@ -2,12 +2,17 @@ import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/commo
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    private httpService: HttpService
+  ) {}
 
-  use(req: Request, res: Response, next: NextFunction) {
+  async use(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         throw new UnauthorizedException('Cabeçalho de autorização (Authorization) está ausente');
@@ -28,15 +33,41 @@ export class JwtMiddleware implements NestMiddleware {
         
         const decoded = jwt.verify(token, secret);
         
-        // Armazenamos o token original junto com o payload decodificado
+        let userId: any;
         if (typeof decoded === 'object') {
+            userId = decoded.sub || decoded.id;
             (req as any).user = { ...decoded, rawToken: token };
         } else {
             (req as any).user = decoded;
         }
 
+        // --- VALIDAÇÃO NO BANCO DE DADOS (auth-api) ---
+        if (userId) {
+            try {
+                // Fazer uma chamada para a API de Autenticação para checar se o usuário existe
+                const authApiUrl = this.configService.get<string>('AUTH_MICROSERVICE_URL') || 'http://localhost:3000';
+                
+                // Opcionalmente podemos usar o próprio token na requisição
+                const { data: usuario } = await firstValueFrom(
+                    this.httpService.get(`${authApiUrl}/usuarios/${userId}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                );
+
+                if (usuario && usuario.status !== 1) {
+                    throw new Error('Usuário inativo no banco de dados.');
+                }
+            } catch (err: any) {
+                console.error(`Falha ao validar usuário no banco. ID: ${userId}. Motivo: ${err.message}`);
+                throw new UnauthorizedException('Usuário não encontrado ou inativo no sistema.');
+            }
+        }
+
         next();
-    } catch (err) {
+    } catch (err: any) {
+        if (err instanceof UnauthorizedException) {
+            throw err;
+        }
         throw new UnauthorizedException('Token inválido ou expirado');
     }
   }
