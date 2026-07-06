@@ -58,8 +58,15 @@ export class JwtMiddleware implements NestMiddleware {
                     throw new Error('Usuário inativo no banco de dados.');
                 }
             } catch (err: any) {
-                console.error(`Falha ao validar usuário no banco. ID: ${userId}. Motivo: ${err.message}`);
-                throw new UnauthorizedException('Usuário não encontrado ou inativo no sistema.');
+                const motivo = err.message || err.code || 'Servidor auth-api indisponível (caiu ou porta errada)';
+                console.error(`Falha ao validar usuário no banco. ID: ${userId}. Motivo: ${motivo}`);
+                
+                // Se for um erro de indisponibilidade de rede (ECONNREFUSED)
+                if (err.code === 'ECONNREFUSED') {
+                    console.error('🚨 ALERTA CRÍTICO: O microsserviço auth-api não está rodando na porta 3000!');
+                }
+                
+                throw new UnauthorizedException('Usuário não encontrado, inativo ou serviço de autenticação indisponível.');
             }
         }
 
