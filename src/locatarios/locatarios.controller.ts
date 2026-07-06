@@ -38,6 +38,15 @@ export class LocatariosController {
         return this.locatariosService.findOne(+id, req.user);
     }
 
+    // O Reativar também adicionado antes do Delete genérico
+    @Patch(':id/reativar')
+    reactivate(
+        @Param('id') id: string,
+        @Req() req: any
+    ) {
+        return this.locatariosService.reactivate(+id, req.user);
+    }
+
     @Patch(':id')
     update(
         @Param('id') id: string,
@@ -47,14 +56,6 @@ export class LocatariosController {
         return this.locatariosService.update(+id, updateLocatarioDto, req.user);
     }
 
-    // O Reativar também adicionado antes do Delete genérico
-    @Patch(':id/reativar')
-    reactivate(
-        @Param('id') id: string,
-        @Req() req: any
-    ) {
-        return this.locatariosService.reactivate(+id, req.user);
-    }
 
     @Delete(':id')
     remove(

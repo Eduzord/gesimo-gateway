@@ -23,6 +23,13 @@ export class ImoveisController {
         return this.imoveisService.findAllImoveis(req.user);
     }
 
+    // --- HEALTH ---
+    @Get('health')
+    @ApiOperation({ summary: 'Verificar status do microsserviço de imóveis' })
+    checkHealth() {
+        return this.imoveisService.checkHealth();
+    }
+
     @Get(':id')
     @ApiOperation({ summary: 'Buscar imóvel por ID' })
     findOneImovel(@Param('id') id: string, @Req() req: any) {
@@ -156,10 +163,4 @@ export class ImoveisController {
     }
 
 
-    // --- HEALTH ---
-    @Get('health')
-    @ApiOperation({ summary: 'Verificar status do microsserviço de imóveis' })
-    checkHealth() {
-        return this.imoveisService.checkHealth();
-    }
 }

@@ -41,6 +41,14 @@ export class LocadorController {
         return this.locadorService.findOne(+id, req.user);
     }
 
+    // 4. ROTA DE REATIVAR ARRUMADA PARA NÃO DAR CONFLITO COM O UPDATE
+    @Patch(':id/reativar')
+    reactivate(
+        @Param('id') id: string,
+        @Req() req: any) {
+        return this.locadorService.reactivate(+id, req.user);
+    }
+
     @Patch(':id')
     update(
         @Param('id') id: string,
@@ -49,13 +57,6 @@ export class LocadorController {
         return this.locadorService.update(+id, updateLocadorDto, req.user);
     }
 
-    // 4. ROTA DE REATIVAR ARRUMADA PARA NÃO DAR CONFLITO COM O UPDATE
-    @Patch(':id/reativar')
-    reactivate(
-        @Param('id') id: string,
-        @Req() req: any) {
-        return this.locadorService.reactivate(+id, req.user);
-    }
 
     @Delete(':id')
     remove(
