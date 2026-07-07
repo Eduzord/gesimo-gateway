@@ -57,6 +57,13 @@ export class LocatariosController {
     }
 
 
+    @Delete(':id/hard')
+    removeHard(
+        @Param('id') id: string,
+        @Req() req: any) {
+        return this.locatariosService.removeHard(+id, req.user);
+    }
+
     @Delete(':id')
     remove(
         @Param('id') id: string,
