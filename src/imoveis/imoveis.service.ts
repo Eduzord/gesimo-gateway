@@ -72,6 +72,13 @@ export class ImoveisService {
         return data;
     }
 
+    async removeHardImovel(id: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.delete(`${this.baseUrl}/imoveis/${id}/hard`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
     // --- CONTRATOS ---
     async createContrato(createContratoDto: any, user: any) {
         const { data } = await firstValueFrom(
@@ -120,6 +127,13 @@ export class ImoveisService {
         return data;
     }
 
+    async removeHardContrato(id: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.delete(`${this.baseUrl}/contratos/${id}/hard`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
     // --- DESPESAS ---
     async createDespesa(createDespesaDto: any, user: any) {
         const { data } = await firstValueFrom(
@@ -164,6 +178,13 @@ export class ImoveisService {
     async removeDespesa(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.delete(`${this.baseUrl}/despesas/${id}`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async removeHardDespesa(id: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.delete(`${this.baseUrl}/despesas/${id}/hard`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
         );
         return data;
     }

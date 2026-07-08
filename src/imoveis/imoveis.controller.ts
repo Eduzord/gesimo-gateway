@@ -48,6 +48,12 @@ export class ImoveisController {
         return this.imoveisService.removeImovel(+id, req.user);
     }
 
+    @Delete(':id/hard')
+    @ApiOperation({ summary: 'Remover imóvel definitivamente' })
+    removeHardImovel(@Param('id') id: string, @Req() req: any) {
+        return this.imoveisService.removeHardImovel(+id, req.user);
+    }
+
     // --- CONTRATOS ---
     @Post('contratos')
     @ApiOperation({ summary: 'Criar um contrato' })
@@ -100,6 +106,12 @@ export class ImoveisController {
     @ApiOperation({ summary: 'Rescindir um contrato' })
     rescindirContrato(@Param('id') id: string, @Req() req: any) {
         return this.imoveisService.rescindirContrato(+id, req.user);
+    }
+
+    @Delete('contratos/:id/hard')
+    @ApiOperation({ summary: 'Remover contrato definitivamente' })
+    removeHardContrato(@Param('id') id: string, @Req() req: any) {
+        return this.imoveisService.removeHardContrato(+id, req.user);
     }
 
 
@@ -160,6 +172,12 @@ export class ImoveisController {
     @ApiOperation({ summary: 'Deletar despesa' })
     removeDespesa(@Param('id') id: string, @Req() req: any) {
         return this.imoveisService.removeDespesa(+id, req.user);
+    }
+
+    @Delete('despesas/:id/hard')
+    @ApiOperation({ summary: 'Remover despesa definitivamente' })
+    removeHardDespesa(@Param('id') id: string, @Req() req: any) {
+        return this.imoveisService.removeHardDespesa(+id, req.user);
     }
 
 

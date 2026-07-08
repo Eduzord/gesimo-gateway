@@ -50,4 +50,15 @@ export class AgendamentosController {
     ) {
         return this.agendamentosService.cancel(+id, req.user);
     }
+
+    // -----------------------------
+    // REMOVER AGENDAMENTO (HARD DELETE)
+    // -----------------------------
+    @Delete(':id/hard')
+    removeHard(
+        @Param('id') id: string,
+        @Req() req: any
+    ) {
+        return this.agendamentosService.removeHard(+id, req.user);
+    }
 }

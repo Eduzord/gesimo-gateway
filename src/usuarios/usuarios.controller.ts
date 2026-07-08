@@ -38,4 +38,9 @@ export class UsuariosController {
     remove(@Param('id') id: string, @Req() req: any) {
         return this.usuariosService.remove(+id, req.user);
     }
+
+    @Delete(':id/hard')
+    removeHard(@Param('id') id: string, @Req() req: any) {
+        return this.usuariosService.removeHard(+id, req.user);
+    }
 }

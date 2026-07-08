@@ -58,6 +58,13 @@ export class LocadorController {
     }
 
 
+    @Delete(':id/hard')
+    removeHard(
+        @Param('id') id: string,
+        @Req() req: any) {
+        return this.locadorService.removeHard(+id, req.user);
+    }
+
     @Delete(':id')
     remove(
         @Param('id') id: string,

@@ -70,4 +70,13 @@ export class UsuariosService {
     );
     return data;
   }
+
+  async removeHard(id: number, user: any) {
+    const { data } = await firstValueFrom(
+      this.httpService.delete(`${this.targetUrl}/${id}/hard`, {
+        headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }
+      }).pipe(catchError(this.handleError))
+    );
+    return data;
+  }
 }
