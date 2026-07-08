@@ -60,11 +60,7 @@ export class ImoveisController {
 
     // --- CONTRATOS ---
     @Post('contratos')
-    @ApiOperation({
-        if (!req?.user || req.user.role !== 'ADMIN') {
-            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
-        }
- summary: 'Criar um contrato' })
+    @ApiOperation({ summary: 'Criar um contrato' })
     createContrato(@Body() createContratoDto: any, @Req() req: any) {
         return this.imoveisService.createContrato(createContratoDto, req.user);
     }
@@ -129,11 +125,7 @@ export class ImoveisController {
 
     // --- DESPESAS ---
     @Post('despesas')
-    @ApiOperation({
-        if (!req?.user || req.user.role !== 'ADMIN') {
-            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
-        }
- summary: 'Lançar de despesas' })
+    @ApiOperation({ summary: 'Lançar de despesas' })
     createDespesa(@Body() createDespesaDto: any, @Req() req: any) {
         return this.imoveisService.createDespesa(createDespesaDto, req.user);
     }
