@@ -8,7 +8,7 @@ export class LocadorService {
     private targetUrl: string;
 
     constructor(private readonly httpService: HttpService, private configService: ConfigService) {
-        const baseUrl = this.configService.get('LOCADORES_MICROSERVICE_URL') || 'http://localhost:3001/';
+        const baseUrl = this.configService.get('LOCADORES_MICROSERVICE_URL') || 'http://localhost:3001';
 
         // Depois montamos a rota de usuários
         this.targetUrl = `${baseUrl}/locadores`;
@@ -36,12 +36,19 @@ export class LocadorService {
     }
 
     // FIND ALL - Rota protegida
-    async findAll(user: any) {
+    async findAll(filtros: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(this.targetUrl, {
-                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token!
+                params: filtros,
+                headers: {
+                    Authorization: `Bearer ${user?.rawToken}`,
+                    'x-user-id': user?.sub || user?.id,
+                    'x-user-role': user?.role,
+                    'x-user-email': user?.email,
+                },
             }).pipe(catchError(this.handleError))
         );
+
         return data;
     }
 
