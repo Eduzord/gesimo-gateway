@@ -8,7 +8,7 @@ export class LocadorService {
     private targetUrl: string;
 
     constructor(private readonly httpService: HttpService, private configService: ConfigService) {
-        const baseUrl = this.configService.get('LOCADORES_MICROSERVICE_URL') || 'http://localhost:3001/';
+        const baseUrl = this.configService.get('LOCADORES_MICROSERVICE_URL') || 'http://localhost:3001';
 
         // Depois montamos a rota de usuários
         this.targetUrl = `${baseUrl}/locadores`;
@@ -27,7 +27,6 @@ export class LocadorService {
 
     async createLocadores(createLocadorDto: any, user: any) {
         // LOG DE SEGURANÇA PARA DEBUGAR
-        console.log("Token enviado para o microsserviço:", user?.rawToken);
 
         const { data } = await firstValueFrom(
             this.httpService.post(this.targetUrl, createLocadorDto, {
@@ -42,22 +41,34 @@ export class LocadorService {
         return data;
     }
     // FIND ALL - Rota protegida
-    async findAll(user: any) {
+    async findAll(filtros: any, user: any) {
         const { data } = await firstValueFrom(
+            
             this.httpService.get(this.targetUrl, {
+                params: filtros,
                 headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email } // Repassa o token!
             }).pipe(catchError(this.handleError))
         );
         return data;
     }
-
     async findActive(filtros: any, user: any) {
+        const params = {
+            page: Number(filtros.page ?? 1),
+            limit: Number(filtros.limit ?? 10),
+        };
+
         const { data } = await firstValueFrom(
             this.httpService.get(this.targetUrl, {
-                headers: { Authorization: `Bearer ${user?.rawToken}`, 'x-user-id': user?.sub || user?.id, 'x-user-role': user?.role, 'x-user-email': user?.email }, // Repassa o token!
-                params: filtros
+                headers: {
+                    Authorization: `Bearer ${user?.rawToken}`,
+                    'x-user-id': user?.sub || user?.id,
+                    'x-user-role': user?.role,
+                    'x-user-email': user?.email
+                },
+                params
             }).pipe(catchError(this.handleError))
         );
+
         return data;
     }
 

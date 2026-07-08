@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ImoveisService } from './imoveis/imoveis.service'; 
+import { ImoveisService } from './imoveis/imoveis.service';
 import { AgendamentosService } from './agendamentos/agendamentos.service'; // Importação do novo serviço
 
 @Injectable()
@@ -12,7 +12,7 @@ export class AppService {
     // Futuramente, você injetará os outros domínios aqui:
     // private readonly locadorService: LocadorService,
     // private readonly locatariosService: LocatariosService,
-  ) {}
+  ) { }
 
   getHello(): string {
     return 'Hello World!';
@@ -22,8 +22,8 @@ export class AppService {
     try {
       // 1. Buscando dados do domínio de imóveis em paralelo
       const [listaImoveis, listaContratos, listaAgendamentos] = await Promise.all([
-        this.imoveisService.getImoveis(user),
-        this.imoveisService.getContratos(user), // Chamando contratos através do mesmo service
+        this.imoveisService.findAllImoveis(user),
+        this.imoveisService.findAllContratos(user), // Chamando contratos através do mesmo service
         this.agendamentosService.findAll(user), // Buscando todo o histórico de agendamentos
         // this.locadorService.getLocadores(user) // Para o futuro
       ]);
@@ -44,10 +44,10 @@ export class AppService {
       contratos.forEach(contrato => {
         // ATENÇÃO: Verifique qual é o nome exato da propriedade de data no seu Prisma
         // Pode ser dataVencimento, dataFim, validade, etc.
-        if (!contrato.dataVencimento) return; 
-        
+        if (!contrato.dataVencimento) return;
+
         const dataVenc = new Date(contrato.dataVencimento);
-        
+
         // Calcula a diferença em dias
         const diferencaDias = Math.ceil((dataVenc.getTime() - hoje.getTime()) / (1000 * 3600 * 24));
 
@@ -76,7 +76,7 @@ export class AppService {
           const dataAg = new Date(ag.data);
           // Formata a hora para o padrão 09:00, 14:30, etc.
           const horaFormatada = dataAg.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-          
+
           // Estilização condicional baseada no status/tipo do banco
           let badgeLabel = 'Reunião';
           let badgeClass = 'bg-gray-100 text-gray-700';
@@ -95,7 +95,7 @@ export class AppService {
           return {
             time: horaFormatada,
             description: ag.tipo || 'Compromisso',
-            client: `Cliente ID: ${ag.id_locatario || 'N/D'}`, 
+            client: `Cliente ID: ${ag.id_locatario || 'N/D'}`,
             badge: badgeLabel,
             badgeClass: badgeClass
           };
@@ -124,7 +124,7 @@ export class AppService {
       };
     } catch (error) {
       console.error('Erro no Gateway ao compilar Dashboard:', error.message);
-      
+
       // Fallback para não quebrar a tela em caso de falha no microserviço
       return {
         imoveis: 0, locadores: 0, locatarios: 0, compromissos: 0,

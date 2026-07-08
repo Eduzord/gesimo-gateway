@@ -35,14 +35,14 @@ export class AppModule implements NestModule {
       .apply(JwtMiddleware)
       .exclude(
         { path: 'usuarios', method: RequestMethod.POST },
-        { path: 'locador/health', method: RequestMethod.GET },
+        { path: 'locadores/health', method: RequestMethod.GET },
         { path: 'locatarios/health', method: RequestMethod.GET },
         { path: 'imoveis/health', method: RequestMethod.GET }
       )
       .forRoutes(
         'agendamentos',
         'imoveis',
-        'locador',
+        'locadores',
         'locatarios',
         'roles',
         'usuarios'
