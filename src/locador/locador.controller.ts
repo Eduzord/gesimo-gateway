@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Headers, Patch, Query , Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Headers, Patch, Query , Req, UnauthorizedException } from '@nestjs/common';
 import { LocadorService } from './locador.service';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
@@ -62,6 +62,10 @@ export class LocadorController {
     removeHard(
         @Param('id') id: string,
         @Req() req: any) {
+        if (!req?.user || req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
+        }
+
         return this.locadorService.removeHard(+id, req.user);
     }
 
@@ -69,6 +73,10 @@ export class LocadorController {
     remove(
         @Param('id') id: string,
         @Req() req: any) {
+        if (!req?.user || req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
+        }
+
         return this.locadorService.remove(+id, req.user);
     }
 }

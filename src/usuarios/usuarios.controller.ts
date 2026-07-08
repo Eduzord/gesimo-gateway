@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Headers, Patch , Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Headers, Patch , Req, UnauthorizedException } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
@@ -41,6 +41,10 @@ export class UsuariosController {
 
     @Delete(':id/hard')
     removeHard(@Param('id') id: string, @Req() req: any) {
+        if (!req?.user || req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
+        }
+
         return this.usuariosService.removeHard(+id, req.user);
     }
 }

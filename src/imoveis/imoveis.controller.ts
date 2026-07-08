@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, Patch, Query, Req, UploadedFile, UseInterceptors, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Patch, Query, Req, UploadedFile, UseInterceptors, Res, UnauthorizedException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImoveisService } from './imoveis.service';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
@@ -51,12 +51,20 @@ export class ImoveisController {
     @Delete(':id/hard')
     @ApiOperation({ summary: 'Remover imóvel definitivamente' })
     removeHardImovel(@Param('id') id: string, @Req() req: any) {
+        if (!req?.user || req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
+        }
+
         return this.imoveisService.removeHardImovel(+id, req.user);
     }
 
     // --- CONTRATOS ---
     @Post('contratos')
-    @ApiOperation({ summary: 'Criar um contrato' })
+    @ApiOperation({
+        if (!req?.user || req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
+        }
+ summary: 'Criar um contrato' })
     createContrato(@Body() createContratoDto: any, @Req() req: any) {
         return this.imoveisService.createContrato(createContratoDto, req.user);
     }
@@ -111,13 +119,21 @@ export class ImoveisController {
     @Delete('contratos/:id/hard')
     @ApiOperation({ summary: 'Remover contrato definitivamente' })
     removeHardContrato(@Param('id') id: string, @Req() req: any) {
+        if (!req?.user || req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
+        }
+
         return this.imoveisService.removeHardContrato(+id, req.user);
     }
 
 
     // --- DESPESAS ---
     @Post('despesas')
-    @ApiOperation({ summary: 'Lançar de despesas' })
+    @ApiOperation({
+        if (!req?.user || req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
+        }
+ summary: 'Lançar de despesas' })
     createDespesa(@Body() createDespesaDto: any, @Req() req: any) {
         return this.imoveisService.createDespesa(createDespesaDto, req.user);
     }
@@ -177,6 +193,10 @@ export class ImoveisController {
     @Delete('despesas/:id/hard')
     @ApiOperation({ summary: 'Remover despesa definitivamente' })
     removeHardDespesa(@Param('id') id: string, @Req() req: any) {
+        if (!req?.user || req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Acesso negado. Apenas ADMIN pode realizar esta ação.');
+        }
+
         return this.imoveisService.removeHardDespesa(+id, req.user);
     }
 
