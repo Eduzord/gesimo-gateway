@@ -8,6 +8,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
 import { RolesModule } from './roles/roles.module';
 import { LocadorModule } from './locador/locador.module';
 import { ImoveisModule } from './imoveis/imoveis.module';
+import { IrrfModule } from './irrf/irrf.module';
 import { LocatariosModule } from './locatarios/locatarios.module';
 import { AgendamentosModule } from './agendamentos/agendamentos.module';
 import { JwtMiddleware } from './auth/jwt.middleware';
@@ -23,6 +24,7 @@ import { JwtMiddleware } from './auth/jwt.middleware';
     RolesModule,
     LocadorModule,
     ImoveisModule,
+    IrrfModule,
     LocatariosModule,
     AgendamentosModule,
   ],
@@ -42,6 +44,7 @@ export class AppModule implements NestModule {
       .forRoutes(
         'agendamentos',
         'imoveis',
+        'irrf',
         'locadores',
         'locatarios',
         'roles',

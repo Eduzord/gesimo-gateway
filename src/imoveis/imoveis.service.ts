@@ -51,6 +51,13 @@ export class ImoveisService {
         return data;
     }
     
+    async findImoveisByLocador(idLocador: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/imoveis/locador/${idLocador}`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
     async findOneImovel(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.get(`${this.baseUrl}/imoveis/${id}`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
@@ -87,9 +94,11 @@ export class ImoveisService {
         return data;
     }
 
-    async findAllContratos(user: any) {
+    async findAllContratos(filtros: { idImovel?: string; idLocatario?: string; idLocador?: string }, user: any) {
+        // Só repassa os filtros que vieram preenchidos
+        const params = Object.fromEntries(Object.entries(filtros).filter(([, valor]) => valor !== undefined && valor !== ''));
         const { data } = await firstValueFrom(
-            this.httpService.get(`${this.baseUrl}/contratos`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+            this.httpService.get(`${this.baseUrl}/contratos`, { headers: this.getHeaders(user), params }).pipe(catchError(this.handleError))
         );
         return data;
     }

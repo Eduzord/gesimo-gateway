@@ -30,10 +30,12 @@ export class ImoveisController {
         return this.imoveisService.checkHealth();
     }
 
-    @Get(':id')
-    @ApiOperation({ summary: 'Buscar imóvel por ID' })
-    findOneImovel(@Param('id') id: string, @Req() req: any) {
-        return this.imoveisService.findOneImovel(+id, req.user);
+    // Rotas literais (health, contratos, despesas, locador/:id) precisam ficar antes de @Get(':id'),
+    // senão o Nest as trata como se fossem um ID.
+    @Get('locador/:idLocador')
+    @ApiOperation({ summary: 'Listar imóveis em que o locador é proprietário' })
+    findImoveisByLocador(@Param('idLocador') idLocador: string, @Req() req: any) {
+        return this.imoveisService.findImoveisByLocador(+idLocador, req.user);
     }
 
     @Patch(':id')
@@ -66,9 +68,14 @@ export class ImoveisController {
     }
 
     @Get('contratos')
-    @ApiOperation({ summary: 'Listar contratos' })
-    findAllContratos(@Req() req: any) {
-        return this.imoveisService.findAllContratos(req.user);
+    @ApiOperation({ summary: 'Listar contratos (filtros opcionais: idImovel, idLocatario, idLocador)' })
+    findAllContratos(
+        @Query('idImovel') idImovel: string,
+        @Query('idLocatario') idLocatario: string,
+        @Query('idLocador') idLocador: string,
+        @Req() req: any,
+    ) {
+        return this.imoveisService.findAllContratos({ idImovel, idLocatario, idLocador }, req.user);
     }
 
     @Get('contratos/:id')
@@ -192,5 +199,11 @@ export class ImoveisController {
         return this.imoveisService.removeHardDespesa(+id, req.user);
     }
 
+    // --- IMÓVEL POR ID (deve ser a última rota GET com um único segmento dinâmico) ---
+    @Get(':id')
+    @ApiOperation({ summary: 'Buscar imóvel por ID' })
+    findOneImovel(@Param('id') id: string, @Req() req: any) {
+        return this.imoveisService.findOneImovel(+id, req.user);
+    }
 
 }
