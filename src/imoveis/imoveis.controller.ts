@@ -129,6 +129,18 @@ export class ImoveisController {
         return this.imoveisService.removeHardContrato(+id, req.user);
     }
 
+    @Patch('contratos/:id/reajuste')
+    @ApiOperation({ summary: 'Aplicar um reajuste anual ao contrato (grava o histórico e atualiza o valorAluguel vigente)' })
+    aplicarReajuste(@Param('id') id: string, @Body() aplicarReajusteDto: any, @Req() req: any) {
+        return this.imoveisService.aplicarReajuste(+id, aplicarReajusteDto, req.user);
+    }
+
+    @Get('contratos/:id/reajustes')
+    @ApiOperation({ summary: 'Listar o histórico de reajustes de um contrato' })
+    listarReajustes(@Param('id') id: string, @Req() req: any) {
+        return this.imoveisService.listarReajustes(+id, req.user);
+    }
+
 
     // --- DESPESAS ---
     @Post('despesas')
@@ -141,6 +153,12 @@ export class ImoveisController {
     @ApiOperation({ summary: 'Listar despesas' })
     findAllDespesas(@Query('idContrato') idContrato: string, @Req() req: any) {
         return this.imoveisService.findAllDespesas(idContrato, req.user);
+    }
+
+    @Get('despesas/imovel/:idImovel')
+    @ApiOperation({ summary: 'Listar despesas de um imóvel (todos os contratos). ?emAberto=true filtra as em aberto' })
+    findDespesasPorImovel(@Param('idImovel') idImovel: string, @Query('emAberto') emAberto: string, @Req() req: any) {
+        return this.imoveisService.findDespesasPorImovel(+idImovel, emAberto, req.user);
     }
 
     @Patch('despesas/:id/pagamento')
@@ -197,6 +215,45 @@ export class ImoveisController {
         }
 
         return this.imoveisService.removeHardDespesa(+id, req.user);
+    }
+
+    // --- MEMÓRIA DE CÁLCULO ---
+    @Get('memoria-calculo/imovel/:idImovel/preparacao')
+    @ApiOperation({ summary: 'Dados para montar a tela de geração da memória de cálculo' })
+    prepararMemoriaCalculo(@Param('idImovel') idImovel: string, @Query('competencia') competencia: string, @Req() req: any) {
+        return this.imoveisService.prepararMemoriaCalculo(+idImovel, competencia, req.user);
+    }
+
+    @Get('memoria-calculo/imovel/:idImovel/historico')
+    @ApiOperation({ summary: 'Listar as memórias de cálculo já geradas para um imóvel' })
+    listarMemoriasCalculo(@Param('idImovel') idImovel: string, @Req() req: any) {
+        return this.imoveisService.listarMemoriasCalculo(+idImovel, req.user);
+    }
+
+    @Post('memoria-calculo')
+    @ApiOperation({ summary: 'Gerar (ou reutilizar) a memória de cálculo de um mês' })
+    gerarMemoriaCalculo(@Body() dto: any, @Req() req: any) {
+        return this.imoveisService.gerarMemoriaCalculo(dto, req.user);
+    }
+
+    @Get('memoria-calculo/:id')
+    @ApiOperation({ summary: 'Buscar uma memória de cálculo já gerada' })
+    buscarMemoriaCalculo(@Param('id') id: string, @Req() req: any) {
+        return this.imoveisService.buscarMemoriaCalculo(+id, req.user);
+    }
+
+    @Get('memoria-calculo/:id/excel')
+    @ApiOperation({ summary: 'Baixar a memória de cálculo em Excel (.xlsx)' })
+    async baixarMemoriaCalculoExcel(@Param('id') id: string, @Res() res: Response, @Req() req: any) {
+        const { buffer, nomeArquivo } = await this.imoveisService.baixarMemoriaCalculoExcel(+id, req.user);
+
+        //Repassa o nome com acentos preservados (RFC 5987), com fallback ASCII no "filename" plain.
+        const nomeArquivoAscii = nomeArquivo.normalize('NFD').replace(/[̀-ͯ]/g, '');
+        res.set({
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition': `attachment; filename="${nomeArquivoAscii}"; filename*=UTF-8''${encodeURIComponent(nomeArquivo)}`,
+        });
+        res.send(buffer);
     }
 
     // --- IMÓVEL POR ID (deve ser a última rota GET com um único segmento dinâmico) ---

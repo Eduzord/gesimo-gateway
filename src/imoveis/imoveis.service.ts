@@ -143,6 +143,20 @@ export class ImoveisService {
         return data;
     }
 
+    async aplicarReajuste(id: number, aplicarReajusteDto: any, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.patch(`${this.baseUrl}/contratos/${id}/reajuste`, aplicarReajusteDto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async listarReajustes(id: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/contratos/${id}/reajustes`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
     // --- DESPESAS ---
     async createDespesa(createDespesaDto: any, user: any) {
         const { data } = await firstValueFrom(
@@ -155,6 +169,14 @@ export class ImoveisService {
         const url = idContrato ? `${this.baseUrl}/despesas?idContrato=${idContrato}` : `${this.baseUrl}/despesas`;
         const { data } = await firstValueFrom(
             this.httpService.get(url, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async findDespesasPorImovel(idImovel: number, emAberto: string | undefined, user: any) {
+        const params = emAberto ? { emAberto } : {};
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/despesas/imovel/${idImovel}`, { headers: this.getHeaders(user), params }).pipe(catchError(this.handleError))
         );
         return data;
     }
@@ -196,6 +218,54 @@ export class ImoveisService {
             this.httpService.delete(`${this.baseUrl}/despesas/${id}/hard`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
         );
         return data;
+    }
+
+    // --- MEMÓRIA DE CÁLCULO ---
+    async prepararMemoriaCalculo(idImovel: number, competencia: string, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/memoria-calculo/imovel/${idImovel}/preparacao`, {
+                headers: this.getHeaders(user), params: { competencia },
+            }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async listarMemoriasCalculo(idImovel: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/memoria-calculo/imovel/${idImovel}/historico`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async gerarMemoriaCalculo(dto: any, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.post(`${this.baseUrl}/memoria-calculo`, dto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async buscarMemoriaCalculo(id: number, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/memoria-calculo/${id}`, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async baixarMemoriaCalculoExcel(id: number, user: any): Promise<{ buffer: Buffer; nomeArquivo: string }> {
+        const response = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/memoria-calculo/${id}/excel`, {
+                headers: this.getHeaders(user), responseType: 'arraybuffer',
+            }).pipe(catchError(this.handleError))
+        );
+
+        //Prioriza o "filename*" (RFC 5987, UTF-8) para preservar acentos; cai para o "filename" plain se não houver.
+        const disposicao: string = response.headers['content-disposition'] || '';
+        const nomeArquivoUtf8 = disposicao.match(/filename\*=UTF-8''([^;]+)/)?.[1];
+        const nomeArquivo = nomeArquivoUtf8
+            ? decodeURIComponent(nomeArquivoUtf8)
+            : disposicao.match(/filename="(.+)"/)?.[1] || `memoria-calculo-${id}.xlsx`;
+
+        return { buffer: Buffer.from(response.data), nomeArquivo };
     }
 
     // --- HEALTH ---

@@ -10,6 +10,7 @@ import { LocadorModule } from './locador/locador.module';
 import { ImoveisModule } from './imoveis/imoveis.module';
 import { IrrfModule } from './irrf/irrf.module';
 import { LocatariosModule } from './locatarios/locatarios.module';
+import { ContasBancariasModule } from './contas-bancarias/contas-bancarias.module';
 import { AgendamentosModule } from './agendamentos/agendamentos.module';
 import { JwtMiddleware } from './auth/jwt.middleware';
 
@@ -26,6 +27,7 @@ import { JwtMiddleware } from './auth/jwt.middleware';
     ImoveisModule,
     IrrfModule,
     LocatariosModule,
+    ContasBancariasModule,
     AgendamentosModule,
   ],
   controllers: [AppController],
@@ -43,6 +45,7 @@ export class AppModule implements NestModule {
       )
       .forRoutes(
         'agendamentos',
+        'contas-bancarias',
         'imoveis',
         'irrf',
         'locadores',
