@@ -20,6 +20,8 @@ describe('ImoveisController - ordem das rotas', () => {
     listarTodasMemoriasCalculo: jest.fn().mockResolvedValue([]),
     buscarMemoriaCalculo: jest.fn().mockResolvedValue({ id: 1 }),
     baixarMemoriaCalculoExcel: jest.fn().mockResolvedValue({ buffer: Buffer.from('PK'), nomeArquivo: 'memoria.xlsx' }),
+    montarInformeRendimentos: jest.fn().mockResolvedValue({}),
+    baixarInformeRendimentosPdf: jest.fn().mockResolvedValue({ buffer: Buffer.from('%PDF-'), nomeArquivo: 'informe.pdf' }),
   };
 
   beforeAll(async () => {
@@ -133,5 +135,24 @@ describe('ImoveisController - ordem das rotas', () => {
 
     expect(resposta.headers['content-type']).toContain('spreadsheetml');
     expect(resposta.headers['content-disposition']).toContain('memoria.xlsx');
+  });
+
+  it('GET /imoveis/informe-rendimentos não cai na rota :id', async () => {
+    await request(app.getHttpServer()).get('/imoveis/informe-rendimentos?idImovel=2&idLocador=2&ano=2026').expect(200);
+
+    expect(service.findOneImovel).not.toHaveBeenCalled();
+    expect(service.montarInformeRendimentos).toHaveBeenCalledWith(
+      { idImovel: '2', idLocador: '2', ano: '2026' },
+      undefined,
+    );
+  });
+
+  it('GET /imoveis/informe-rendimentos/pdf devolve o binário com content-type correto', async () => {
+    const resposta = await request(app.getHttpServer())
+      .get('/imoveis/informe-rendimentos/pdf?idImovel=2&idLocador=2&ano=2026&nomeLocador=Fulano')
+      .expect(200);
+
+    expect(resposta.headers['content-type']).toBe('application/pdf');
+    expect(resposta.headers['content-disposition']).toContain('informe.pdf');
   });
 });

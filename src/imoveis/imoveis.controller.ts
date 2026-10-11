@@ -274,6 +274,28 @@ export class ImoveisController {
         res.send(buffer);
     }
 
+    // --- INFORME DE RENDIMENTOS ---
+    // Rotas literais, declaradas antes de ':id' — "informe-rendimentos" sozinho bateria com :id, já que
+    // ambos têm só 1 segmento (ver o mesmo cuidado em 'despesas', 'contratos' etc. acima).
+    @Get('informe-rendimentos')
+    @ApiOperation({ summary: 'Prévia (JSON) do Informe de Rendimentos de um locador, num imóvel, num ano' })
+    montarInformeRendimentos(@Query() query: Record<string, string>, @Req() req: any) {
+        return this.imoveisService.montarInformeRendimentos(query, req.user);
+    }
+
+    @Get('informe-rendimentos/pdf')
+    @ApiOperation({ summary: 'Baixar o Informe de Rendimentos em PDF' })
+    async baixarInformeRendimentosPdf(@Query() query: Record<string, string>, @Res() res: Response, @Req() req: any) {
+        const { buffer, nomeArquivo } = await this.imoveisService.baixarInformeRendimentosPdf(query, req.user);
+
+        const nomeArquivoAscii = nomeArquivo.normalize('NFD').replace(/[̀-ͯ]/g, '');
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${nomeArquivoAscii}"; filename*=UTF-8''${encodeURIComponent(nomeArquivo)}`,
+        });
+        res.send(buffer);
+    }
+
     // --- IMÓVEL POR ID (deve ser a última rota GET com um único segmento dinâmico) ---
     @Get(':id')
     @ApiOperation({ summary: 'Buscar imóvel por ID' })

@@ -293,6 +293,30 @@ export class ImoveisService {
         return { buffer: Buffer.from(response.data), nomeArquivo };
     }
 
+    // --- INFORME DE RENDIMENTOS ---
+    async montarInformeRendimentos(params: Record<string, string>, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/informe-rendimentos`, { headers: this.getHeaders(user), params }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
+    async baixarInformeRendimentosPdf(params: Record<string, string>, user: any): Promise<{ buffer: Buffer; nomeArquivo: string }> {
+        const response = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/informe-rendimentos/pdf`, {
+                headers: this.getHeaders(user), params, responseType: 'arraybuffer',
+            }).pipe(catchError(this.handleError))
+        );
+
+        const disposicao: string = response.headers['content-disposition'] || '';
+        const nomeArquivoUtf8 = disposicao.match(/filename\*=UTF-8''([^;]+)/)?.[1];
+        const nomeArquivo = nomeArquivoUtf8
+            ? decodeURIComponent(nomeArquivoUtf8)
+            : disposicao.match(/filename="(.+)"/)?.[1] || 'informe-de-rendimentos.pdf';
+
+        return { buffer: Buffer.from(response.data), nomeArquivo };
+    }
+
     // --- HEALTH ---
     async checkHealth() {
         const { data } = await firstValueFrom(
