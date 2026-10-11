@@ -113,6 +113,12 @@ export class ImoveisController {
         return this.imoveisService.updateContratoDados(+id, atualizarContratoDto, req.user);
     }
 
+    @Patch('contratos/:id/nome')
+    @ApiOperation({ summary: 'Renomear um contrato (disponível em qualquer status)' })
+    renomearContrato(@Param('id') id: string, @Body() renomearContratoDto: any, @Req() req: any) {
+        return this.imoveisService.renomearContrato(+id, renomearContratoDto, req.user);
+    }
+
     @Patch('contratos/:id/rescisao')
     @ApiOperation({ summary: 'Rescindir um contrato' })
     rescindirContrato(@Param('id') id: string, @Req() req: any) {

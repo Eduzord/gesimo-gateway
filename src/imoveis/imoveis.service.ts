@@ -129,6 +129,13 @@ export class ImoveisService {
         return data;
     }
 
+    async renomearContrato(id: number, renomearContratoDto: any, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.patch(`${this.baseUrl}/contratos/${id}/nome`, renomearContratoDto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
     async rescindirContrato(id: number, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.patch(`${this.baseUrl}/contratos/${id}/rescisao`, {}, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
