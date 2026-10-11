@@ -17,6 +17,7 @@ describe('ImoveisController - ordem das rotas', () => {
     listarReajustes: jest.fn().mockResolvedValue([]),
     prepararMemoriaCalculo: jest.fn().mockResolvedValue({}),
     listarMemoriasCalculo: jest.fn().mockResolvedValue([]),
+    listarTodasMemoriasCalculo: jest.fn().mockResolvedValue([]),
     buscarMemoriaCalculo: jest.fn().mockResolvedValue({ id: 1 }),
     baixarMemoriaCalculoExcel: jest.fn().mockResolvedValue({ buffer: Buffer.from('PK'), nomeArquivo: 'memoria.xlsx' }),
   };
@@ -108,6 +109,16 @@ describe('ImoveisController - ordem das rotas', () => {
 
     expect(service.findOneImovel).not.toHaveBeenCalled();
     expect(service.listarMemoriasCalculo).toHaveBeenCalledWith(9, undefined);
+  });
+
+  it('GET /imoveis/memoria-calculo lista todas (não cai na rota :id)', async () => {
+    await request(app.getHttpServer()).get('/imoveis/memoria-calculo?competencia=2026-07-01').expect(200);
+
+    expect(service.buscarMemoriaCalculo).not.toHaveBeenCalled();
+    expect(service.listarTodasMemoriasCalculo).toHaveBeenCalledWith(
+      { competencia: '2026-07-01', idImovel: undefined },
+      undefined,
+    );
   });
 
   it('GET /imoveis/memoria-calculo/:id busca a memória, e não o imóvel', async () => {

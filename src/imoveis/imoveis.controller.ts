@@ -242,6 +242,12 @@ export class ImoveisController {
         return this.imoveisService.listarMemoriasCalculo(+idImovel, req.user);
     }
 
+    @Get('memoria-calculo')
+    @ApiOperation({ summary: 'Listar as memórias de cálculo já geradas, de todos os imóveis (filtros opcionais: competencia, idImovel)' })
+    listarTodasMemoriasCalculo(@Query('competencia') competencia: string, @Query('idImovel') idImovel: string, @Req() req: any) {
+        return this.imoveisService.listarTodasMemoriasCalculo({ competencia, idImovel }, req.user);
+    }
+
     @Post('memoria-calculo')
     @ApiOperation({ summary: 'Gerar (ou reutilizar) a memória de cálculo de um mês' })
     gerarMemoriaCalculo(@Body() dto: any, @Req() req: any) {

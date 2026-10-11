@@ -251,6 +251,17 @@ export class ImoveisService {
         return data;
     }
 
+    async listarTodasMemoriasCalculo(filtros: { competencia?: string; idImovel?: string }, user: any) {
+        const params: Record<string, string> = {};
+        if (filtros.competencia) params.competencia = filtros.competencia;
+        if (filtros.idImovel) params.idImovel = filtros.idImovel;
+
+        const { data } = await firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/memoria-calculo`, { headers: this.getHeaders(user), params }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
     async gerarMemoriaCalculo(dto: any, user: any) {
         const { data } = await firstValueFrom(
             this.httpService.post(`${this.baseUrl}/memoria-calculo`, dto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
