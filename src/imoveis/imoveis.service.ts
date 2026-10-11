@@ -165,6 +165,13 @@ export class ImoveisService {
         return data;
     }
 
+    async createDespesaParcelada(criarDespesaParceladaDto: any, user: any) {
+        const { data } = await firstValueFrom(
+            this.httpService.post(`${this.baseUrl}/despesas/parceladas`, criarDespesaParceladaDto, { headers: this.getHeaders(user) }).pipe(catchError(this.handleError))
+        );
+        return data;
+    }
+
     async findAllDespesas(idContrato: string | undefined, user: any) {
         const url = idContrato ? `${this.baseUrl}/despesas?idContrato=${idContrato}` : `${this.baseUrl}/despesas`;
         const { data } = await firstValueFrom(

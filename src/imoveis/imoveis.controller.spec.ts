@@ -11,6 +11,7 @@ describe('ImoveisController - ordem das rotas', () => {
     findAllContratos: jest.fn().mockResolvedValue([]),
     findAllDespesas: jest.fn().mockResolvedValue([]),
     findDespesasPorImovel: jest.fn().mockResolvedValue([]),
+    createDespesaParcelada: jest.fn().mockResolvedValue([]),
     findImoveisByLocador: jest.fn().mockResolvedValue([]),
     findOneImovel: jest.fn().mockResolvedValue({ id: 5 }),
     listarReajustes: jest.fn().mockResolvedValue([]),
@@ -71,6 +72,14 @@ describe('ImoveisController - ordem das rotas', () => {
     await request(app.getHttpServer()).get('/imoveis/5').expect(200);
 
     expect(service.findOneImovel).toHaveBeenCalledWith(5, undefined);
+  });
+
+  it('POST /imoveis/despesas/parceladas não cai na rota POST /imoveis/despesas', async () => {
+    const payload = { idContratoLocacao: 1, descricao: 'IPTU 2026', valorTotal: 1000, tipo: 'IPTU', numeroParcelas: 10, dataPrimeiraParcela: '2026-01-10' };
+
+    await request(app.getHttpServer()).post('/imoveis/despesas/parceladas').send(payload).expect(201);
+
+    expect(service.createDespesaParcelada).toHaveBeenCalledWith(payload, undefined);
   });
 
   it('GET /imoveis/despesas/imovel/:idImovel não cai na rota :id', async () => {

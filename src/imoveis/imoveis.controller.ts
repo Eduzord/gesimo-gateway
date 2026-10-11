@@ -149,6 +149,12 @@ export class ImoveisController {
         return this.imoveisService.createDespesa(createDespesaDto, req.user);
     }
 
+    @Post('despesas/parceladas')
+    @ApiOperation({ summary: 'Lançar um valor total já dividido em várias parcelas (ex.: IPTU em 10x)' })
+    createDespesaParcelada(@Body() criarDespesaParceladaDto: any, @Req() req: any) {
+        return this.imoveisService.createDespesaParcelada(criarDespesaParceladaDto, req.user);
+    }
+
     @Get('despesas')
     @ApiOperation({ summary: 'Listar despesas' })
     findAllDespesas(@Query('idContrato') idContrato: string, @Req() req: any) {
